@@ -58,14 +58,18 @@ while True:
                   "\n", "Response text---> ", r_asset.text)
             time.sleep(2)
 
-    # Need to extract the Txn Hash and token of the latest Transfer
-    # from etherscan
-    Txn_Hash = r_json["result"][idx]["hash"]
-    latest_tx = Txn_Hash
-    from_address = str(r_json["result"][idx]["from"])
-    to_address = str(r_json["result"][idx]["to"])
-    input_tx = str(r_json["result"][idx]["input"])
-    tx_type = str(input_tx[0:10])
+    try:
+        # Need to extract the Txn Hash and token of the latest Transfer
+        # from etherscan
+        Txn_Hash = r_json["result"][idx]["hash"]
+        latest_tx = Txn_Hash
+        from_address = str(r_json["result"][idx]["from"])
+        to_address = str(r_json["result"][idx]["to"])
+        input_tx = str(r_json["result"][idx]["input"])
+        tx_type = str(input_tx[0:10])
+    except IndexError:
+        print(r_json)
+        continue
 
     #token_id = str(r_json["result"][0]["tokenID"])
 
