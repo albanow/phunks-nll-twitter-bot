@@ -62,14 +62,15 @@ while True:
         # Need to extract the Txn Hash and token of the latest Transfer
         # from etherscan
         Txn_Hash = r_json["result"][idx]["hash"]
-        latest_tx = Txn_Hash
         from_address = str(r_json["result"][idx]["from"])
         to_address = str(r_json["result"][idx]["to"])
         input_tx = str(r_json["result"][idx]["input"])
         tx_type = str(input_tx[0:10])
     except IndexError:
-        print(r_json)
+        print("IndexError: ", r_json)
         continue
+
+    latest_tx = Txn_Hash
 
     #token_id = str(r_json["result"][0]["tokenID"])
 
@@ -141,12 +142,6 @@ while True:
             # URL of the 'Transaction Details' (sale/transfer) in etherscan
             url_tx = etherscan_base_url+Txn_Hash
 
-            # Download (temporarily) the NFT image to attach it to the twitter post
-            response = requests.get(link_nft_image)
-            file = open("nft_image.png", "wb")
-            file.write(response.content)
-            file.close()
-
             # Final text to post in twitter with a custom message, price in ETH,
             # the price in USD, the URL to the Transaction in etherscan and some hash tags,
             # adapt this code to your needs.
@@ -172,6 +167,23 @@ while True:
                 print("Twitter Authentication Success")
             except:
                 print("Twitter Authentication Error")
+            tweets_urls = []
+            tweets = api.user_timeline(
+                screen_name=sk.twitter_username, count=15)
+            for tweet in tweets:
+                expanded_url = tweet._json["entities"]["urls"][0][
+                    "expanded_url"]
+                tweets_urls.append(expanded_url)
+
+            if url_tx in tweets_urls:
+                print("Avoiding repetead tweet with tx url: ",  url_tx)
+                continue
+
+            # Download (temporarily) the NFT image to attach it to the twitter post
+            response = requests.get(link_nft_image)
+            file = open("nft_image.png", "wb")
+            file.write(response.content)
+            file.close()
 
             # Post the message in your Twitter Bot account
             # with the image of the sold NFT attached
