@@ -133,8 +133,10 @@ while True:
             # the token ID if not then you need to adapt the code to your needs
             # **Contact me if you need help with this
             # For 10,000 NFT collection from 0 to 9999 (4 digits collection)
-            digits_collection = 4
-            token_id = "0" * (digits_collection - len(token_id)) + token_id
+            if len(token_id) == 1:
+                token_id = "00" + token_id
+            elif len(token_id) == 2:
+                token_id = "0" + token_id
 
             # URL of the NFT image in you server including the NFT token ID
             link_nft_image = "https://phunks.s3.us-east-2.amazonaws.com/images/phunk" + \
