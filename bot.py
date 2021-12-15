@@ -11,6 +11,7 @@ import utilities as ut
 request_try = 10
 bid_greater_equal = 2
 idx = 0
+image_name = "nft_image.png"
 
 # Get this from your Twitter development account (not in repo)
 # and you need to add them to secrets_keys.py file in your cloned repo
@@ -136,7 +137,7 @@ while True:
             token_id = "0" * (digits_collection - len(token_id)) + token_id
 
             # URL of the NFT image in you server including the NFT token ID
-            link_nft_image = "https://phunks.s3.us-east-2.amazonaws.com/notpunks/notpunk" + \
+            link_nft_image = "https://phunks.s3.us-east-2.amazonaws.com/images/phunk" + \
                 token_id+".png"
 
             # URL of the 'Transaction Details' (sale/transfer) in etherscan
@@ -181,13 +182,17 @@ while True:
 
             # Download (temporarily) the NFT image to attach it to the twitter post
             response = requests.get(link_nft_image)
-            file = open("nft_image.png", "wb")
+            file = open(image_name, "wb")
             file.write(response.content)
             file.close()
+            if tx_type == bid:
+                ut.create_background(image_name, (152, 87, 183))
+            else:
+                ut.create_background(image_name, (96, 131, 151))
 
             # Post the message in your Twitter Bot account
             # with the image of the sold NFT attached
-            media = api.media_upload("nft_image.png")
+            media = api.media_upload(image_name)
             # Post the message in your Twitter Bot account
             # with the image of the sold NFT attached
             res_status = api.update_status(
@@ -197,7 +202,7 @@ while True:
                 print("Tweet posted at: ", res_status._json["created_at"])
 
             """Remove the downloaded image"""
-            os.remove("nft_image.png")
+            os.remove(image_name)
         elif from_address == sk.vault_token_address:
             print(from_address)
     # The Free Api-Key Token from Etherscan only allows Up to 100,000 API calls per day
