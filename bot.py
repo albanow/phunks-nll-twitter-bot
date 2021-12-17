@@ -67,13 +67,15 @@ while True:
         to_address = str(r_json["result"][idx]["to"])
         input_tx = str(r_json["result"][idx]["input"])
         tx_type = str(input_tx[0:10])
+        is_error = str(r_json["result"][idx]["isError"])
     except IndexError:
         print("IndexError: ", r_json)
         continue
 
+    # Check if the tx was reverted (Fail/error tx)
+    if is_error == "1":
+        continue
     latest_tx = Txn_Hash
-
-    #token_id = str(r_json["result"][0]["tokenID"])
 
     # Here we check if the current Transaction/Sale is already posted.
     # For this we have captured the previous transaction.
@@ -210,4 +212,4 @@ while True:
     # The Free Api-Key Token from Etherscan only allows Up to 100,000 API calls per day
     # so wait some seconds to make a new request to check for a new Transaction
     # Adapt this wait time as you need
-    time.sleep(2)
+    time.sleep(.5)
