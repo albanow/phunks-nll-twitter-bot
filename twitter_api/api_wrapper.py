@@ -45,7 +45,7 @@ def get_tweets_url_tx(api, twitter_username: str, num_tweets: int):
 
     tweets_urls = []
     for tweet in tweets:
-        expanded_url = tweet._json["entities"]["urls"][0][
+        expanded_url = tweet._json["entities"]["urls"][1][
             "expanded_url"]
         tweets_urls.append(expanded_url)
     return tweets_urls

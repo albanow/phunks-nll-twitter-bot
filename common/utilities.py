@@ -194,7 +194,7 @@ def create_final_text(
     '''
     nft_sale_text = project_name+" #"+str(token_id) + action_text + \
         str(final_price_eth) + " ($"+str(final_price_usd)+")\n"
-    tweet_text = nft_sale_text + url_tx + "\n" + url_nft + "\n" + hash_tags
+    tweet_text = nft_sale_text + u"\U0001F4CA" + url_nft + "\n" + u"\U0001F50D"+url_tx + "\n" + hash_tags
 
     return tweet_text
 
