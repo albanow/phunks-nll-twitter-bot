@@ -12,7 +12,7 @@ bid_greater_equal = 2
 idx = 0
 image_name = "nft_image.png"
 hash_tags = "#CryptoPhunks #Phunks #NFTs http://notlarvalabs.com"
-nll_base_url = "https://notlarvalabs.com/cryptophunks/details/"
+nll_base_url = "https://NotLarvaLabs.com/CryptoPhunks/Details/"
 
 # All the etherscan related URLs
 etherscan_base_url = "https://etherscan.io/tx/"
