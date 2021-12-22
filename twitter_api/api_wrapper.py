@@ -1,28 +1,24 @@
 import tweepy
+import secrets_keys as sk
 
 
-def api_authentication(
-        consumer_token: str, consumer_secret: str, key: str, secret: str):
+def api_authentication():
     '''Connection to the twitter API
 
     Args:
-        consumer_token (str): Consumer Keys (API Key)
-        consumer_secret (str): Consumer Keys (API Secret Key)
-        key (str): Authentication Tokens (Access Token)
-        secret (str): Authentication Tokens (Access Token Secret)
+        none
 
     Returns:
         api: api connection
     '''
     # Twitter API connection/authentication
-    auth = tweepy.OAuthHandler(consumer_token, consumer_secret)
+    auth = tweepy.OAuthHandler(sk.consumer_token, sk.consumer_secret)
     try:
         redirect_url = auth.get_authorization_url()
     except tweepy.TweepError:
         print("Error! Failed to get request token.")
 
-    auth = tweepy.OAuthHandler(consumer_token, consumer_secret)
-    auth.set_access_token(key, secret)
+    auth.set_access_token(sk.key, sk.secret)
 
     api = tweepy.API(auth)
     try:

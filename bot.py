@@ -11,13 +11,8 @@ request_try = 10
 bid_greater_equal = 2
 idx = 0
 image_name = "nft_image.png"
-
-# Get this from your Twitter development account (not in repo)
-# and you need to add them to secrets_keys.py file in your cloned repo
-consumer_token = sk.consumer_token
-consumer_secret = sk.consumer_secret
-key = sk.key
-secret = sk.secret
+hash_tags = "#CryptoPhunks #Phunks #NFTs http://notlarvalabs.com"
+nll_base_url = "https://notlarvalabs.com/cryptophunks/details/"
 
 # All the etherscan related URLs
 etherscan_base_url = "https://etherscan.io/tx/"
@@ -38,7 +33,6 @@ time_counter = 0
 while True:
 
     start = time.time()
-    sum_price = 0
 
     # Make a request to get the latest transfer(s).
     # Try request_try times in case any exception is throw
@@ -82,6 +76,7 @@ while True:
             continue
         # Get needed data from tx
         token_id = tx_type_data["token_id"]
+        phunk_url = nll_base_url+token_id
         gwi_value = tx_type_data["gwi_value"]
         action_text = tx_type_data["action_text"]
 
@@ -110,10 +105,7 @@ while True:
             # the token ID if not then you need to adapt the code to your needs
             # **Contact me if you need help with this
             # For 10,000 NFT collection from 0 to 9999 (2-3 and 4 digits collection)
-            if len(token_id) == 1:
-                token_id = "00" + token_id
-            elif len(token_id) == 2:
-                token_id = "0" + token_id
+            token_id = ut.create_token_id_for_image_download(token_id)
 
             # URL of the NFT image in you server including the NFT token ID
             link_nft_image = "https://phunks.s3.us-east-2.amazonaws.com/images/phunk" + \
@@ -127,14 +119,12 @@ while True:
             # the price in USD, the URL to the Transaction details in etherscan and
             # some hash tags, adapt this code to your needs.
             # **Contact me if you need help with this
-            nft_sale_text = "Phunk #"+str(token_id) + action_text + \
-                str(final_price_eth) + " ($"+str(final_price_usd)+")\n"
-            hash_tags = "#CryptoPhunks #Phunks #NFTs http://notlarvalabs.com"
-            tweet_text = nft_sale_text + url_tx + "\n" + hash_tags
+            nft_sale_text = ut.create_final_text(
+                "Phunk", token_id, action_text, final_price_eth,
+                final_price_usd, url_tx, phunk_url, hash_tags)
 
             # Twitter API connection/authentication
-            api = tw.api_authentication(
-                consumer_token, consumer_secret, key, secret)
+            api = tw.api_authentication()
 
             # Get all the URLs from the past 15 tweets (post)
             tweets_urls = tw.get_tweets_url_tx(api, sk.twitter_username, 15)
@@ -146,15 +136,14 @@ while True:
                 time_counter = time_counter + (end - start)
                 continue
 
-            # Download (temporarily) the NFT image to attach it to the twitter post
-            ut.download_image(link_nft_image, image_name)
             # Create final image wiht purple background for bids and
             # blue background for sales and accepted bids
-            ut.create_final_image(tx_type, image_name)
+            ut.create_image_to_post(link_nft_image, image_name, tx_type)
 
             # Post the message in your Twitter Bot account
             # with the image of the sold NFT attached
-            res_status = tw.post_tweet_wiht_media(api, image_name, tweet_text)
+            res_status = tw.post_tweet_wiht_media(
+                api, image_name, nft_sale_text)
 
             if "created_at" in res_status._json:
                 print("Tweet posted at: ", res_status._json["created_at"])
@@ -170,11 +159,11 @@ while True:
         time_counter = 0
 
         # Twitter API connection/authentication
-        api = tw.api_authentication(
-            consumer_token, consumer_secret, key, secret)
+        api = tw.api_authentication()
 
         # Get all the URLs from the past 30 tweets (post)
         last_tweets_urls = tw.get_tweets_url_tx(api, sk.twitter_username, 30)
+
         # Get last 30 tx
         last_transfers = etherscan.get_last_valid_transfers(
             request_try, etherscan_url_transfers, 30)
@@ -195,6 +184,7 @@ while True:
                     continue
                 # Get needed data from tx
                 token_id = tx_type_data["token_id"]
+                phunk_url = nll_base_url+token_id
                 gwi_value = tx_type_data["gwi_value"]
                 action_text = tx_type_data["action_text"]
 
@@ -213,10 +203,11 @@ while True:
                 # Pice in USD of the Token/NFT sale/transfer
                 final_price_usd = round(final_price_eth*usd_price, 2)
 
-                if len(token_id) == 1:
-                    token_id = "00" + token_id
-                elif len(token_id) == 2:
-                    token_id = "0" + token_id
+                # The following only applies if the URL image of your NFT includes
+                # the token ID if not then you need to adapt the code to your needs
+                # **Contact me if you need help with this
+                # For 10,000 NFT collection from 0 to 9999 (2-3 and 4 digits collection)
+                token_id = ut.create_token_id_for_image_download(token_id)
 
                 # URL of the NFT image in you server including the NFT token ID
                 link_nft_image = "https://phunks.s3.us-east-2.amazonaws.com/images/phunk" + \
@@ -230,21 +221,18 @@ while True:
                 # the price in USD, the URL to the Transaction details in etherscan and
                 # some hash tags, adapt this code to your needs.
                 # **Contact me if you need help with this
-                nft_sale_text = "Phunk #"+str(token_id) + action_text + \
-                    str(final_price_eth) + " ($"+str(final_price_usd)+")\n"
-                hash_tags = "#CryptoPhunks #Phunks #NFTs http://notlarvalabs.com"
-                tweet_text = nft_sale_text + url_tx + "\n" + hash_tags
+                nft_sale_text = ut.create_final_text(
+                    "Phunk", token_id, action_text, final_price_eth,
+                    final_price_usd, url_tx, phunk_url, hash_tags)
 
-                # Download (temporarily) the NFT image to attach it to the twitter post
-                ut.download_image(link_nft_image, image_name)
                 # Create final image wiht purple background for bids and
                 # blue background for sales and accepted bids
-                ut.create_final_image(tx_type, image_name)
+                ut.create_image_to_post(link_nft_image, image_name, tx_type)
 
                 # Post the message in your Twitter Bot account
                 # with the image of the sold NFT attached
                 res_status = tw.post_tweet_wiht_media(
-                    api, image_name, tweet_text)
+                    api, image_name, nft_sale_text)
 
                 if "created_at" in res_status._json:
                     print("Missed Tweet posted at: ",

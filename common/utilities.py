@@ -27,19 +27,6 @@ def create_background(image_path: str, rgb_color):
     os.remove("color.png")
 
 
-def create_final_image(tx_type: str, image_name: str):
-    '''Download image from URL
-
-    Args:
-        tx_type (str): tx type to create the image
-        image_name (str): image name to save it in root
-    '''
-    if tx_type == bid:
-        create_background(image_name, (152, 87, 183))
-    else:
-        create_background(image_name, (96, 131, 151))
-
-
 def get_token_bid_or_sale(hex_input: str):
     '''Get the token id from hex input (bid or sale tx)
 
@@ -160,3 +147,71 @@ def download_image(image_url: str, image_name: str):
     file = open(image_name, "wb")
     file.write(response.content)
     file.close()
+
+
+def create_final_image(tx_type: str, image_name: str):
+    '''Download image from URL
+
+    Args:
+        tx_type (str): tx type to create the image
+        image_name (str): image name to save it in root
+    '''
+    if tx_type == bid:
+        create_background(image_name, (152, 87, 183))
+    else:
+        create_background(image_name, (96, 131, 151))
+
+
+def create_image_to_post(image_url: str, image_name: str, tx_type: str):
+    '''Create the image to post on twitter
+
+    Args:
+        image_url (str): url of the image to download
+        image_name (str): image name to save it in root
+        tx_type (str): tx type to create the image
+    '''
+    download_image(image_url, image_name)
+    create_final_image(tx_type, image_name)
+
+
+def create_final_text(
+        project_name: str, token_id: str, action_text: str, final_price_eth,
+        final_price_usd, url_tx, url_nft, hash_tags):
+    '''Create the image to post on twitter
+
+    Args:
+        project_name (str): Project name to append at the start of the text
+        token_id (str): token id of the NFT
+        action_text (str): action text to append to the final text
+        final_price_eth : final price of the tx (in eth)
+        final_price_usd : final price of the tx (in usd)
+        url_tx (str): url of the transaction
+        url_nft (str): url of the NFT sale on the marketplace
+        hash_tags (str): some hashtags to add to the tweet
+
+        Returns:
+        tweet_text (str): final text to tweet
+    '''
+    nft_sale_text = project_name+" #"+str(token_id) + action_text + \
+        str(final_price_eth) + " ($"+str(final_price_usd)+")\n"
+    tweet_text = nft_sale_text + url_tx + "\n" + url_nft + "\n" + hash_tags
+
+    return tweet_text
+
+
+def create_token_id_for_image_download(token_id):
+    '''Create the image to post on twitter
+
+    Args:
+        token_id (str): token id of the NFT
+
+    Returns:
+        token_id_res (str): token id to downlad image
+    '''
+    token_id_res = token_id
+    if len(token_id) == 1:
+        token_id_res = "00" + token_id
+    elif len(token_id) == 2:
+        token_id_res = "0" + token_id
+
+    return token_id_res
